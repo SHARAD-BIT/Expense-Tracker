@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -22,8 +23,8 @@ export function OnboardingScreen({
   const slide = onboardingSlides[currentIndex];
   const isLastSlide = currentIndex === onboardingSlides.length - 1;
   const currentVisual = slideVisuals[currentIndex];
-  const isCompact = height < 780;
-  const isShort = height < 720;
+  const isCompact = height < 820;
+  const isShort = height < 740;
 
   const previewLabels = useMemo(
     () => ['Track', 'Understand', 'Control'],
@@ -33,6 +34,7 @@ export function OnboardingScreen({
     () => ({
       screenPaddingBottom: isShort ? theme.spacing.lg : theme.spacing.xl,
       topMarginBottom: isShort ? theme.spacing.lg : theme.spacing['2xl'],
+      bodyGap: isShort ? theme.spacing.lg : theme.spacing.xl,
       panelPadding: isShort ? theme.spacing.lg : theme.spacing.xl,
       panelGap: isShort ? theme.spacing.lg : theme.spacing.xl,
       illustrationPadding: isShort ? theme.spacing.md : theme.spacing.lg,
@@ -61,9 +63,8 @@ export function OnboardingScreen({
 
   return (
     <ScreenWrapper
-      scrollable
       contentContainerStyle={[
-        styles.content,
+        styles.screen,
         { paddingBottom: layout.screenPaddingBottom },
       ]}
     >
@@ -86,7 +87,16 @@ export function OnboardingScreen({
         </Pressable>
       </View>
 
-      <View style={styles.body}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { gap: layout.bodyGap, paddingBottom: theme.spacing.md },
+        ]}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollArea}
+      >
         <View
           style={[
             styles.illustrationPanel,
@@ -96,132 +106,132 @@ export function OnboardingScreen({
             },
           ]}
         >
-        <View style={styles.previewHeader}>
-          <View style={styles.previewHeaderCopy}>
-            <Text style={styles.previewEyebrow}>{slide.eyebrow}</Text>
-            <Text
+          <View style={styles.previewHeader}>
+            <View style={styles.previewHeaderCopy}>
+              <Text style={styles.previewEyebrow}>{slide.eyebrow}</Text>
+              <Text
+                style={[
+                  styles.previewTitle,
+                  isShort ? styles.previewTitleCompact : null,
+                ]}
+              >
+                {currentVisual.panelTitle}
+              </Text>
+            </View>
+            <View
               style={[
-                styles.previewTitle,
-                isShort ? styles.previewTitleCompact : null,
+                styles.previewHeaderBadge,
+                {
+                  paddingVertical: layout.headerBadgePadding,
+                },
               ]}
             >
-              {currentVisual.panelTitle}
-            </Text>
+              <Text style={styles.previewHeaderBadgeText}>
+                {currentVisual.badge}
+              </Text>
+            </View>
           </View>
+
           <View
             style={[
-              styles.previewHeaderBadge,
+              styles.illustrationCard,
+              { padding: layout.illustrationPadding },
+            ]}
+          >
+            <View style={styles.illustrationTopRow}>
+              <View
+                style={[
+                  styles.illustrationIconWrap,
+                  isShort ? styles.illustrationIconWrapCompact : null,
+                ]}
+              >
+                <Ionicons
+                  name={slide.icon}
+                  size={isShort ? 24 : 28}
+                  color={theme.colors.primaryDark}
+                />
+              </View>
+              <View style={styles.illustrationSummary}>
+                <Text style={styles.illustrationSummaryLabel}>
+                  {currentVisual.figureLabel}
+                </Text>
+                <Text style={styles.illustrationSummaryValue}>
+                  {currentVisual.figureValue}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.chartShell}>
+              <View style={[styles.chartRow, { height: layout.chartHeight }]}>
+                {currentVisual.bars.map((height, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.chartBar,
+                      {
+                        height: Math.max(
+                          height * (isShort ? 0.74 : isCompact ? 0.84 : 1),
+                          isShort ? 22 : 26
+                        ),
+                        opacity: index === currentIndex + 1 ? 1 : 0.75,
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+              <View style={styles.progressTrack}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    { width: `${currentVisual.progress}%` },
+                  ]}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={[
+              styles.detailBand,
               {
-                paddingVertical: layout.headerBadgePadding,
+                gap: layout.detailGap,
+                padding: layout.detailPadding,
               },
             ]}
           >
-            <Text style={styles.previewHeaderBadgeText}>
-              {currentVisual.badge}
-            </Text>
-          </View>
-        </View>
-
-        <View
-          style={[
-            styles.illustrationCard,
-            { padding: layout.illustrationPadding },
-          ]}
-        >
-          <View style={styles.illustrationTopRow}>
-            <View
-              style={[
-                styles.illustrationIconWrap,
-                isShort ? styles.illustrationIconWrapCompact : null,
-              ]}
-            >
-              <Ionicons
-                name={slide.icon}
-                size={isShort ? 24 : 28}
-                color={theme.colors.primaryDark}
-              />
-            </View>
-            <View style={styles.illustrationSummary}>
-              <Text style={styles.illustrationSummaryLabel}>
-                {currentVisual.figureLabel}
-              </Text>
-              <Text style={styles.illustrationSummaryValue}>
-                {currentVisual.figureValue}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.chartShell}>
-            <View style={[styles.chartRow, { height: layout.chartHeight }]}>
-              {currentVisual.bars.map((height, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.chartBar,
-                    {
-                      height: Math.max(
-                        height * (isShort ? 0.74 : isCompact ? 0.84 : 1),
-                        isShort ? 22 : 26
-                      ),
-                      opacity: index === currentIndex + 1 ? 1 : 0.75,
-                    },
-                  ]}
-                />
+            <View style={[styles.metricRow, { gap: layout.metricRowGap }]}>
+              {previewLabels.map((label, index) => (
+                <View key={label} style={styles.metricItem}>
+                  <Text style={styles.metricTileLabel}>{label}</Text>
+                  <Text
+                    style={[
+                      styles.metricTileValue,
+                      isShort ? styles.metricTileValueCompact : null,
+                    ]}
+                  >
+                    {index === currentIndex ? 'Active' : 'Ready'}
+                  </Text>
+                </View>
               ))}
             </View>
-            <View style={styles.progressTrack}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: `${currentVisual.progress}%` },
-                ]}
-              />
-            </View>
-          </View>
-        </View>
 
-        <View
-          style={[
-            styles.detailBand,
-            {
-              gap: layout.detailGap,
-              padding: layout.detailPadding,
-            },
-          ]}
-        >
-          <View style={[styles.metricRow, { gap: layout.metricRowGap }]}>
-            {previewLabels.map((label, index) => (
-              <View key={label} style={styles.metricItem}>
-                <Text style={styles.metricTileLabel}>{label}</Text>
-                <Text
+            <View style={styles.chipRow}>
+              {slide.highlights.map((item) => (
+                <View
+                  key={item}
                   style={[
-                    styles.metricTileValue,
-                    isShort ? styles.metricTileValueCompact : null,
+                    styles.highlightChip,
+                    {
+                      paddingHorizontal: layout.chipHorizontalPadding,
+                      paddingVertical: layout.chipVerticalPadding,
+                    },
                   ]}
                 >
-                  {index === currentIndex ? 'Active' : 'Ready'}
-                </Text>
-              </View>
-            ))}
+                  <Text style={styles.highlightText}>{item}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-
-          <View style={styles.chipRow}>
-            {slide.highlights.map((item) => (
-              <View
-                key={item}
-                style={[
-                  styles.highlightChip,
-                  {
-                    paddingHorizontal: layout.chipHorizontalPadding,
-                    paddingVertical: layout.chipVerticalPadding,
-                  },
-                ]}
-              >
-                <Text style={styles.highlightText}>{item}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
         </View>
 
         <View style={[styles.copyBlock, { gap: layout.copyGap }]}>
@@ -237,34 +247,34 @@ export function OnboardingScreen({
             {slide.subtitle}
           </Text>
         </View>
+      </ScrollView>
 
-        <View style={[styles.footerBlock, { gap: layout.footerGap }]}>
-          <View style={styles.paginationRow}>
-            {onboardingSlides.map((item, index) => (
-              <View
-                key={item.id}
-                style={[
-                  styles.paginationDot,
-                  index === currentIndex ? styles.paginationDotActive : null,
-                ]}
-              />
-            ))}
-          </View>
-
-          {layout.showFooterHint ? (
-            <Text style={styles.footerHint}>
-              {isLastSlide
-                ? 'Your setup starts here.'
-                : 'A quick first look before login.'}
-            </Text>
-          ) : null}
-
-          <View style={styles.actionBlock}>
-            <AppButton
-              onPress={handleNext}
-              title={isLastSlide ? 'Get Started' : 'Next'}
+      <View style={[styles.footerBlock, { gap: layout.footerGap }]}>
+        <View style={styles.paginationRow}>
+          {onboardingSlides.map((item, index) => (
+            <View
+              key={item.id}
+              style={[
+                styles.paginationDot,
+                index === currentIndex ? styles.paginationDotActive : null,
+              ]}
             />
-          </View>
+          ))}
+        </View>
+
+        {layout.showFooterHint ? (
+          <Text style={styles.footerHint}>
+            {isLastSlide
+              ? 'Your setup starts here.'
+              : 'A quick first look before login.'}
+          </Text>
+        ) : null}
+
+        <View style={styles.actionBlock}>
+          <AppButton
+            onPress={handleNext}
+            title={isLastSlide ? 'Get Started' : 'Next'}
+          />
         </View>
       </View>
     </ScreenWrapper>
@@ -299,18 +309,20 @@ const slideVisuals = [
 ] as const;
 
 const styles = StyleSheet.create({
-  content: {
+  screen: {
     flex: 1,
     paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing.lg,
   },
+  scrollArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
   topRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  body: {
-    flex: 1,
     justifyContent: 'space-between',
   },
   skipButton: {
@@ -479,6 +491,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   footerBlock: {
+    paddingTop: theme.spacing.sm,
   },
   paginationRow: {
     flexDirection: 'row',
